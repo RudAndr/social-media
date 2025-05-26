@@ -1,4 +1,7 @@
 package com.rudenko.socialmedia.data.request.user
 
-class UserEditAction {
+enum UserEditAction {
+    PASSWORD_CHANGE,
+    USERNAME_CHANGE,
+    DISPLAY_NAME_CHANGE
 }

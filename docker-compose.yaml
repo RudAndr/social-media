@@ -11,7 +11,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
     volumes:
       - ./mongo-configuration/mongod.conf:/etc/mongod.conf:ro
-#      - ./mongo-configuration/keyfile:/data/keyfile:ro
       - ./mongo-configuration/init-replica.js:/docker-entrypoint-initdb.d/init-replica.js:ro
     networks:
       - mongo-net
@@ -28,7 +27,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
     volumes:
       - ./mongo-configuration/mongod.conf:/etc/mongod.conf:ro
-#      - ./mongo-configuration/keyfile:/data/keyfile:ro
       - ./mongo-configuration/init-replica.js:/docker-entrypoint-initdb.d/init-replica.js:ro
     networks:
       - mongo-net
@@ -41,7 +39,6 @@ services:
       - mongo_secondary1
     volumes:
       - ./mongo-configuration/mongod.conf:/etc/mongod.conf:ro
-#      - ./mongo-configuration/keyfile:/data/keyfile:ro
       - ./mongo-configuration/init-replica.js:/init-replica.js:ro
     entrypoint: >
       bash -c "

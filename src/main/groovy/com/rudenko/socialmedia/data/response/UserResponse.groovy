@@ -1,4 +1,4 @@
-package com.rudenko.socialmedia.data.dto
+package com.rudenko.socialmedia.data.response
 
-record UserDTO(String username, String displayName) {
+record UserResponse(String id, String username, String displayName) {
 }

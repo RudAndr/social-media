@@ -3,6 +3,7 @@ package com.rudenko.socialmedia.configuration
 import com.rudenko.socialmedia.data.security.SocialUserDetails
 import com.rudenko.socialmedia.repository.user.UserInfoRepository
 import com.rudenko.socialmedia.service.security.JwtService
+import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextImpl
@@ -12,7 +13,6 @@ import reactor.core.publisher.Mono
 
 
 class JwtSecurityContextRepository implements ServerSecurityContextRepository {
-    private static final String AUTH_HEADER_NAME = "Authorization"
     private static final String TOKEN_PREFIX = "Bearer "
 
     private final JwtService jwtService
@@ -30,7 +30,7 @@ class JwtSecurityContextRepository implements ServerSecurityContextRepository {
 
     @Override
     Mono<SecurityContext> load(ServerWebExchange exchange) {
-        def authHeader = exchange.getRequest().getHeaders().getFirst(AUTH_HEADER_NAME)
+        def authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION)
 
         if (authHeader == null || !authHeader.startsWith(TOKEN_PREFIX)) {
             return Mono.empty()

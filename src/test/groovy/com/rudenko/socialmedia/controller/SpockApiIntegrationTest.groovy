@@ -13,7 +13,7 @@ import spock.lang.Specification
 @SpringBootTest
 @ContextConfiguration(classes = TestReactiveSecurityConfig)
 @AutoConfigureWebTestClient
-abstract class SpockIntegrationTest extends Specification {
+abstract class SpockApiIntegrationTest extends Specification {
 
     @Autowired
     protected WebTestClient webTestClient

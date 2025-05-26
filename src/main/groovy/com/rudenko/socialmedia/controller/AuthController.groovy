@@ -42,14 +42,10 @@ class AuthController {
     @PostMapping("/login")
     Mono<ApiResponse<TokenResponse>> login(@RequestBody LoginRequest request) {
         return userService.findUserByUsername(request.getUsername())
-                .flatMap { user ->
-                    if (passwordEncoder.matches(request.password, user.password)) {
-                        def token = jwtService.generateToken(user.username)
-                        return Mono.just(ApiResponse.wrapOkResponse(new TokenResponse(token)))
-                    } else {
-                        return Mono.error(new InvalidCredentialsException("Invalid login credentials!"))
-                    }
-                }
+                .filter {passwordEncoder.matches(request.password, it.password) }
+                .map {jwtService.generateToken(it.username) }
+                .map {new TokenResponse(it) }
+                .map {ApiResponse.wrapOkResponse(it)  }
                 .switchIfEmpty(Mono.error(new InvalidCredentialsException("Invalid login credentials!")))
     }
 }

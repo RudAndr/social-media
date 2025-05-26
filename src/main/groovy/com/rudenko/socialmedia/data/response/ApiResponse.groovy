@@ -4,7 +4,7 @@ import groovy.transform.CompileStatic
 import org.springframework.http.HttpStatus
 
 @CompileStatic
-class ApiResponse<T> {
+final class ApiResponse<T> {
     private final boolean success
     private final Integer status
     private final T data
@@ -16,11 +16,11 @@ class ApiResponse<T> {
     }
 
     boolean getSuccess() {
-        return success
+        return Boolean.valueOf(success)
     }
 
     Integer getStatus() {
-        return status
+        return Integer.valueOf(status)
     }
 
     T getData() {

@@ -5,6 +5,7 @@ import com.rudenko.socialmedia.data.response.ApiResponse
 import com.rudenko.socialmedia.data.response.PostResponse
 import com.rudenko.socialmedia.data.entity.Post
 import com.rudenko.socialmedia.data.entity.User
+import com.rudenko.socialmedia.data.security.SocialUserDetails
 import com.rudenko.socialmedia.service.post.PostGeneralService
 import org.springframework.http.MediaType
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -22,39 +23,42 @@ import reactor.core.publisher.Mono
 
 @RestController
 @RequestMapping("/api/v1/posts")
-class PostController {
+class PostGeneralController {
 
     private final PostGeneralService postService
 
-    PostController(PostGeneralService postService) {
+    PostGeneralController(PostGeneralService postService) {
         this.postService = postService
     }
 
-    @GetMapping(value = "/{username}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    Flux<ApiResponse<PostResponse>> getPosts(@PathVariable(value = "username", required = false) String username,
-                                             @AuthenticationPrincipal User currentUser) {
-        return postService.getPosts(username, currentUser)
+    @GetMapping("/{userId}")
+    Flux<ApiResponse<PostResponse>> getPosts(@PathVariable(value = "userId", required = false) String userId,
+                                             @AuthenticationPrincipal SocialUserDetails currentUser) {
+        return postService.getPosts(userId, currentUser.user)
                 .map { new PostResponse(it) }
                 .map { ApiResponse.wrapOkResponse(it) }
     }
 
     @PostMapping
-    Mono<ApiResponse<PostResponse>> createPost(@RequestBody PostResponse post) {
-        return postService.createPost(new Post(post))
+    Mono<ApiResponse<PostResponse>> createPost(@RequestBody PostResponse post,
+                                               @AuthenticationPrincipal SocialUserDetails currentUser) {
+        return postService.createPost(new Post(post).tap { it.userId = currentUser.user.id })
                 .map { new PostResponse(it) }
                 .map { ApiResponse.wrapOkResponse(it) }
     }
 
     @DeleteMapping("/{postId}")
-    Mono<ApiResponse<Boolean>> deletePost(@PathVariable("postId") String postId) {
-        return postService.deletePost(postId)
+    Mono<ApiResponse<Boolean>> deletePost(@PathVariable("postId") String postId,
+                                          @AuthenticationPrincipal SocialUserDetails currentUser) {
+        return postService.deletePost(postId, currentUser.user.id)
                 .map { ApiResponse.wrapOkResponse(it) }
     }
 
     @PutMapping("/{postId}")
     Mono<ApiResponse<PostResponse>> editPost(@PathVariable("postId") String postId,
-                                             @RequestBody EditPostRequest editPostRequest) {
-        return postService.editPost(postId, editPostRequest)
+                                             @RequestBody EditPostRequest editPostRequest,
+                                             @AuthenticationPrincipal SocialUserDetails currentUser) {
+        return postService.editPost(postId, editPostRequest, currentUser.user.id)
                 .map { new PostResponse(it) }
                 .map { ApiResponse.wrapOkResponse(it) }
     }

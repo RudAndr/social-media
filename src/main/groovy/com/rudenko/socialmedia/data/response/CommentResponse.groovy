@@ -1,14 +1,18 @@
 package com.rudenko.socialmedia.data.response
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.rudenko.socialmedia.data.entity.Comment
 
 class CommentResponse {
     private String postId
-    private List<Comment> comments
+    private Comment comment
 
-    CommentResponse(String postId, List<Comment> comments) {
+    @JsonCreator
+    CommentResponse(@JsonProperty("postId") String postId,
+                    @JsonProperty("comment") Comment comment) {
         this.postId = postId
-        this.comments = comments
+        this.comment = comment
     }
 
     String getPostId() {
@@ -19,11 +23,11 @@ class CommentResponse {
         this.postId = postId
     }
 
-    List<Comment> getComments() {
-        return comments
+    Comment getComment() {
+        return comment
     }
 
-    void setComments(List<Comment> comments) {
-        this.comments = comments
+    void setComment(Comment comment) {
+        this.comment = comment
     }
 }

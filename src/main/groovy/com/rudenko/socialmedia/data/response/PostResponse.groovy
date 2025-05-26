@@ -1,24 +1,48 @@
-package com.rudenko.socialmedia.data.dto
+package com.rudenko.socialmedia.data.response
 
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.rudenko.socialmedia.data.entity.Comment
 import com.rudenko.socialmedia.data.entity.Post
 
 import java.time.LocalDateTime
 
 @JsonInclude(Include.NON_NULL)
-class PostDTO {
+class PostResponse {
     private String id
-    private String targetId
+    private String userId
     private LocalDateTime postedAt
     private String messageText
-    private Long likes
+    private List<String> likes
+    private List<Comment> comments
 
-    PostDTO(Post post) {
+    PostResponse() {
+    }
+
+    @JsonCreator
+    PostResponse(@JsonProperty("id") String id,
+                 @JsonProperty("userId") String userId,
+                 @JsonProperty("postedAt") LocalDateTime postedAt,
+                 @JsonProperty("messageText") String messageText,
+                 @JsonProperty("likes") List<String> likes,
+                 @JsonProperty("comments") List<Comment> comments) {
+        this.id = id
+        this.userId = userId
+        this.postedAt = postedAt
+        this.messageText = messageText
+        this.likes = likes
+        this.comments = comments
+    }
+
+    PostResponse(Post post) {
         this.id = post.id
-        this.targetId = post.targetId
+        this.userId = post.userId
         this.postedAt = post.postedAt
         this.messageText = post.messageText
+        this.likes = post.likedBy
+        this.comments = post.comments
     }
 
     String getId() {
@@ -29,12 +53,12 @@ class PostDTO {
         this.id = id
     }
 
-    String getTargetId() {
-        return targetId
+    String getUserId() {
+        return userId
     }
 
-    void setTargetId(String targetId) {
-        this.targetId = targetId
+    void setUserId(String targetId) {
+        this.userId = targetId
     }
 
     LocalDateTime getPostedAt() {
@@ -53,11 +77,19 @@ class PostDTO {
         this.messageText = messageText
     }
 
-    Long getLikes() {
+    List<String> getLikes() {
         return likes
     }
 
-    void setLikes(Long likes) {
+    void setLikes(List<String> likes) {
         this.likes = likes
+    }
+
+    List<Comment> getComments() {
+        return comments
+    }
+
+    void setComments(List<Comment> comments) {
+        this.comments = comments
     }
 }

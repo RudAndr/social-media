@@ -1,50 +1,40 @@
 package com.rudenko.socialmedia.controller.post
 
-import com.rudenko.socialmedia.data.entity.User
-import com.rudenko.socialmedia.data.request.post.EditPostRequest
-import com.rudenko.socialmedia.data.request.post.PostEditAction
 import com.rudenko.socialmedia.data.response.ApiResponse
-import com.rudenko.socialmedia.data.response.CommentResponse
 import com.rudenko.socialmedia.data.response.PostResponse
-import com.rudenko.socialmedia.service.post.PostService
+import com.rudenko.socialmedia.data.security.SocialUserDetails
+import com.rudenko.socialmedia.service.post.PostLikeService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping("/api/v1/posts/{action}")
-class PostActionController {
+@RequestMapping("/api/v1/posts/{postId}/like")
+class PostLikeController {
 
-    private final PostService postService
+    private final PostLikeService postLikeService
 
-    PostActionController(PostService postService) {
-        this.postService = postService
+    PostLikeController(PostLikeService postLikeService) {
+        this.postLikeService = postLikeService
     }
 
-    Mono<ApiResponse<PostResponse>> likePost() {
-
-    }
-
-    Mono<ApiResponse<PostResponse>> dislikePost() {
-        
-    }
-
-    @PutMapping("/{action}/{postId}") //todo refactor
-    Mono<ApiResponse<PostResponse>> editPost(@PathVariable("action") PostEditAction postAction,
-                                             @PathVariable("postId") String postId,
-                                             @RequestBody(required = false) EditPostRequest editPostRequest,
-                                             @AuthenticationPrincipal User currentUser) {
-        return postService.editPost(postAction, postId, editPostRequest, currentUser)
+    @PostMapping
+    Mono<ApiResponse<PostResponse>> addLike(@PathVariable("postId") String postId,
+                                            @AuthenticationPrincipal SocialUserDetails currentUser) {
+        return postLikeService.addLike(postId, currentUser.user)
                 .map { new PostResponse(it) }
                 .map { ApiResponse.wrapOkResponse(it) }
     }
 
-
-
-    @PostMapping("/{postId}/comments")
-    Mono<ApiResponse<CommentResponse>> postComment(@PathVariable String postId) {
-
+    @DeleteMapping
+    Mono<ApiResponse<PostResponse>> removeLike(@PathVariable("postId") String postId,
+                                               @AuthenticationPrincipal SocialUserDetails currentUser) {
+        return postLikeService.removeLike(postId, currentUser.user)
+                .map { new PostResponse(it) }
+                .map { ApiResponse.wrapOkResponse(it) }
     }
-
-
 }

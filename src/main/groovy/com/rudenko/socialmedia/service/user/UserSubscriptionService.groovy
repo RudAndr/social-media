@@ -1,22 +1,23 @@
-package com.rudenko.socialmedia.service
+package com.rudenko.socialmedia.service.user
 
-import com.rudenko.socialmedia.repository.UserRepository
+import com.rudenko.socialmedia.repository.user.UserSubscriptionRepository
 import org.springframework.stereotype.Service
+import reactor.core.publisher.Mono
 
 @Service
-class SubscriptionService {
+class UserSubscriptionService {
 
-    private final UserRepository userRepository
+    private final UserSubscriptionRepository userSubscriptionRepository
 
-    SubscriptionService(UserRepository userRepository) {
-        this.userRepository = userRepository
+    UserSubscriptionService(UserSubscriptionRepository userSubscriptionRepository) {
+        this.userSubscriptionRepository = userSubscriptionRepository
     }
 
-    Boolean subscribe(String subject, String target) {
-        return userRepository.subscribeToUser(subject, target)
+    Mono<Boolean> subscribe(String subjectId, String targetId) {
+        return userSubscriptionRepository.subscribeToUser(subjectId, targetId)
     }
 
-    Boolean unsubscribe(String subject, String target) {
-        return userRepository.unsubscribeFromUser(subject, target)
+    Mono<Boolean> unsubscribe(String subjectId, String targetId) {
+        return userSubscriptionRepository.unsubscribeFromUser(subjectId, targetId)
     }
 }
