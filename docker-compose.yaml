@@ -1,0 +1,62 @@
+services:
+  mongo_primary:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: mongo_primary
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - ./mongo-configuration/mongod.conf:/etc/mongod.conf:ro
+#      - ./mongo-configuration/keyfile:/data/keyfile:ro
+      - ./mongo-configuration/init-replica.js:/docker-entrypoint-initdb.d/init-replica.js:ro
+    networks:
+      - mongo-net
+
+  mongo_secondary1:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: mongo_secondary1
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - ./mongo-configuration/mongod.conf:/etc/mongod.conf:ro
+#      - ./mongo-configuration/keyfile:/data/keyfile:ro
+      - ./mongo-configuration/init-replica.js:/docker-entrypoint-initdb.d/init-replica.js:ro
+    networks:
+      - mongo-net
+
+  mongo_setup:
+    image: mongo:6.0
+    container_name: mongo_setup
+    depends_on:
+      - mongo_primary
+      - mongo_secondary1
+    volumes:
+      - ./mongo-configuration/mongod.conf:/etc/mongod.conf:ro
+#      - ./mongo-configuration/keyfile:/data/keyfile:ro
+      - ./mongo-configuration/init-replica.js:/init-replica.js:ro
+    entrypoint: >
+      bash -c "
+      sleep 10 &&
+      mongosh --host mongo_primary:27017
+      -u root
+      -p rootpassword
+      --authenticationDatabase admin
+      /init-replica.js"
+    networks:
+      - mongo-net
+
+volumes:
+  mongo_data:
+
+networks:
+  mongo-net:
+    driver: bridge
